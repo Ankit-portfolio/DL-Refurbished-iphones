@@ -1,0 +1,984 @@
+<!--
+  This is a complete, self-contained HTML document for a refurbished iPhone market website.
+  It uses Tailwind CSS for all styling, ensuring a modern and responsive design.
+  The JavaScript is included at the bottom, wrapped in a window.onload function,
+  to handle interactive features like modals, a simple cart,
+  search, filter, and sorting.
+
+  This version has been updated to be fully responsive for mobile phones,
+  with adjusted layouts, fonts, and spacing for optimal viewing on small screens.
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Refurbished iPhone Market</title>
+  <!-- Load Tailwind CSS from CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Google Fonts - Inter for a clean, modern look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    /* Simple animation for the modal */
+    .modal-enter {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    .modal-enter-active {
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+    }
+    .modal-exit {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .modal-exit-active {
+      opacity: 0;
+      transform: scale(0.9);
+      transition: opacity 0.2s ease-in, transform 0.2s ease-in;
+    }
+    /* Pulsing animation for the image border */
+    @keyframes pulse-ring {
+      0% { box-shadow: 0 0 0 0px rgba(234, 88, 12, 0.4); }
+      100% { box-shadow: 0 0 0 12px rgba(234, 88, 12, 0); }
+    }
+    .animate-pulse-ring {
+      animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    /* Glowing animation for buttons */
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 8px rgba(234, 88, 12, 0.5), 0 0 12px rgba(234, 88, 12, 0.2); }
+      50% { box-shadow: 0 0 12px rgba(234, 88, 12, 0.8), 0 0 20px rgba(234, 88, 12, 0.4); }
+    }
+    .animate-glow {
+      animation: glow 3s ease-in-out infinite;
+    }
+    /* Animation for the owner's name text glow */
+    @keyframes text-glow {
+      0%, 100% { color: #d1d5db; text-shadow: 0 0 5px rgba(255, 255, 255, 0.2); }
+      50% { color: #f97316; text-shadow: 0 0 10px rgba(249, 115, 22, 0.8); }
+    }
+    .animate-text-glow {
+      animation: text-glow 4s ease-in-out infinite;
+    }
+    /* Animation for the founder card background to shift a subtle gradient */
+    @keyframes gradient-shift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .animate-gradient-shift {
+      background: linear-gradient(270deg, #1f2937, #374151, #1f2937);
+      background-size: 200% 200%;
+      animation: gradient-shift 10s ease-in-out infinite;
+    }
+    /* Simple fade-in animation for success/error messages */
+    @keyframes fade-in {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fade-in 0.3s ease-in-out forwards;
+    }
+
+    /* Styles for the new price range slider */
+    .slider-container {
+      position: relative;
+      height: 20px;
+      margin: 20px 0;
+    }
+    .slider-track {
+      position: absolute;
+      width: 100%;
+      height: 6px;
+      background-color: #e5e7eb;
+      border-radius: 9999px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    /* Updated color for the filled track to match the orange theme */
+    .slider-filled-track {
+      position: absolute;
+      height: 6px;
+      background-color: #f97316; /* Orange color */
+      border-radius: 9999px;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0;
+      right: 0;
+    }
+    /* Updated color for the slider thumb to match the orange theme */
+    .slider-thumb {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: #f97316; /* Orange color */
+      border-radius: 50%;
+      border: 2px solid #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      top: 50%;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body class="bg-gray-200 text-gray-800">
+
+  <!-- Header Section -->
+  <header class="bg-black text-white shadow-sm sticky top-0 z-10">
+    <div class="container mx-auto px-4 py-4 md:py-6 flex justify-between items-center text-center relative">
+      <!-- DL Logo in the top-left corner -->
+      <a href="#" class="absolute left-4 top-1/2 -translate-y-1/2 text-xl sm:text-2xl md:text-3xl font-extrabold text-blue-400">DL</a>
+
+      <!-- Centered Header Title -->
+      <div class="flex-grow text-center">
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-white">
+          <a href="#" class="hover:text-orange-500 transition-colors">DL pvt.ltd.</a>
+        </h1>
+        <p class="text-xs sm:text-sm font-semibold text-gray-400 mt-1">Refurbished I phones at Lowest Price</p>
+      </div>
+
+      <nav class="flex items-center gap-2 sm:gap-4">
+        <!-- "Call Ankit" button with glow animation -->
+        <a href="tel:+918053671703" class="bg-orange-600 text-white font-bold py-2 px-3 sm:px-4 rounded-lg shadow-md hover:bg-orange-700 transition-colors duration-300 flex items-center gap-1 sm:gap-2 focus:outline-none animate-glow">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-call"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/><path d="M14.05 2a9 9 0 0 1 8 7.94"/><path d="M14.05 6a5 5 0 0 1 4 4"/></svg>
+            <span class="hidden md:inline">Call Ankit</span>
+          </a>
+        <button id="contact-button" class="bg-orange-600 text-white font-bold py-2 px-3 sm:px-4 rounded-lg shadow-md hover:bg-orange-700 transition-colors duration-300 focus:outline-none animate-glow">
+          Contact
+        </button>
+        <button id="login-button" class="bg-orange-600 text-white font-bold py-2 px-3 sm:px-4 rounded-lg shadow-md hover:bg-orange-700 transition-colors duration-300 focus:outline-none animate-glow">
+          Login
+        </button>
+        <button id="cart-button" class="relative text-white hover:text-orange-500 transition-colors focus:outline-none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-shopping-cart"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
+          <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center transform scale-0 origin-center transition-transform duration-200">0</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="container mx-auto px-4 py-8 space-y-12">
+
+    <!-- Owner Introduction Section -->
+    <section class="bg-zinc-800 p-6 md:p-12 rounded-2xl shadow-lg">
+      <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-200 mb-6 text-center">
+        Meet the Founder
+      </h2>
+      <div class="flex justify-center">
+        <div class="p-4 md:p-8 rounded-xl shadow-md flex flex-col md:flex-row items-center gap-6 max-w-4xl transition-all duration-300 hover:scale-105 hover:shadow-xl animate-gradient-shift">
+          <div class="relative w-48 h-48 md:w-72 md:h-72 flex-shrink-0 rounded-full animate-pulse-ring">
+              <img src="C:\Users\Ankit\OneDrive\Desktop\web related\WhatsApp Image 2025-06-11 at 13.43.22_ef6397fc.jpg" alt="Website Owner" class="w-full h-full rounded-full border-4 border-orange-400 object-cover shadow-lg">
+          </div>
+          <div class="text-center md:text-left">
+            <h3 class="text-2xl sm:text-3xl font-bold mb-2 animate-text-glow">Ankit Sharma</h3>
+            <p class="text-gray-300 text-sm sm:text-base">
+              "As the founder, my mission is to provide high-quality, reliable refurbished iPhones at a fraction of the cost. Every device is meticulously inspected and certified to ensure you get a phone that looks and performs like new. We're committed to sustainability and customer satisfaction."
+            </p>
+            <div class="flex justify-center md:justify-start gap-4 mt-4">
+              <!-- Facebook Link -->
+              <a href="https://www.facebook.com/profile.php?id=100083089833676" target="_blank" class="text-gray-400 hover:text-orange-500 transition-colors" aria-label="Facebook">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="lucide lucide-facebook"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              </a>
+              <!-- Instagram Link -->
+              <a href="https://www.instagram.com/AnkitSharma" target="_blank" class="text-gray-400 hover:text-orange-500 transition-colors" aria-label="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-instagram"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.5" y1="6.5" y2="6.5"/></svg>
+              </a>
+              <!-- WhatsApp Link -->
+              <a href="https://wa.me/+918053671703" target="_blank" class="text-gray-400 hover:text-orange-500 transition-colors" aria-label="WhatsApp">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="lucide lucide-whatsapp"><path d="M12.016 2.016c-5.522 0-9.999 4.478-9.999 10.001 0 1.776.467 3.491 1.341 5.011l-1.428 5.253 5.409-1.409c1.472.827 3.12 1.254 4.677 1.254 5.523 0 10.001-4.478 10.001-10.001s-4.478-10.001-10.001-10.001zm3.834 14.549c-.218.665-.895 1.096-1.56.877-.665-.219-1.096-.895-.877-1.56.096-.288.134-.601.111-.912-.036-.508-.346-1.056-.632-1.391-.183-.21-.409-.327-.604-.413-.081-.035-.143-.075-.195-.125-.101-.1-.133-.213-.105-.331.028-.118.156-.252.261-.341.104-.089.176-.11.23-.11.054 0 .141.002.262.007.098.004.18.009.243.011.085.002.19.002.289.002.04 0 .092-.001.157-.001.07 0 .152-.001.246-.001.196 0 .385.004.567.013.111.006.216.012.314.02.09.007.18.016.269.026.089.011.176.023.262.036.21.031.42.067.625.111.094.02.186.042.276.066.088.024.175.05.26.078.21.07.411.155.602.247.168.082.33.176.486.279.16.107.31.222.453.344.204.17.388.356.551.554.128.155.244.316.348.484.18.291.319.61.416.945.1.336.147.69.143 1.042-.006.49-.126.963-.357 1.385-.24.444-.593.818-1.037 1.106-.44.288-.934.464-1.464.515-.129.012-.259.018-.388.018-.466 0-.918-.073-1.353-.223-.432-.147-.847-.361-1.225-.637-.215-.157-.425-.331-.628-.52-.093-.087-.184-.176-.272-.267-.091-.091-.178-.186-.26-.282zM12.016 4.029c4.402 0 7.994 3.593 7.994 7.993s-3.592 7.994-7.994 7.994-7.993-3.592-7.993-7.994 3.591-7.993 7.993-7.993zM12.016 1.016c-6.075 0-11 4.925-11 11s4.925 11 11 11 11-4.925 11-11-4.925-11-11-11z"/></svg>
+              </a>
+            </div>
+            <button id="owner-details-btn" class="mt-4 text-sm font-semibold text-orange-400 hover:text-orange-500 transition-colors">
+              View more details →
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Refurbished iPhones Section -->
+    <section>
+      <h2 class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-8 text-center">
+        Our Refurbished iPhones
+      </h2>
+
+      <!-- Search, Sort, and Price Range Controls -->
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+        <!-- Search Input -->
+        <div class="relative w-full sm:w-1/3">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search text-gray-400"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search iPhones..."
+            class="w-full p-3 pl-10 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors"
+          />
+        </div>
+
+        <!-- Sort by Price -->
+        <div class="w-full sm:w-1/3">
+          <label for="sort-by-price" class="sr-only">Sort by Price</label>
+          <select id="sort-by-price" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors">
+            <option value="default">Sort by Default</option>
+            <option value="low-to-high">Price: Low to High</option>
+            <option value="high-to-low">Price: High to Low</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- NEW: Price Range Slider -->
+      <div class="bg-white rounded-xl shadow-lg p-6 mb-8">
+        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 text-center">Price Range</h3>
+        <div class="flex flex-col sm:flex-row items-center gap-8 px-4">
+          <div class="w-full relative py-2">
+            <div id="slider-track" class="slider-track"></div>
+            <div id="slider-filled-track" class="slider-filled-track"></div>
+            <div id="min-thumb" class="slider-thumb"></div>
+            <div id="max-thumb" class="slider-thumb"></div>
+          </div>
+          <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto mt-4 sm:mt-0">
+            <div class="relative flex items-center">
+              <span class="absolute left-3 text-gray-500">₹</span>
+              <input type="number" id="min-price-input" class="w-full sm:w-32 p-3 pl-8 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors text-center" />
+            </div>
+            <div class="relative flex items-center">
+              <span class="absolute left-3 text-gray-500">₹</span>
+              <input type="number" id="max-price-input" class="w-full sm:w-32 p-3 pl-8 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors text-center" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid layout for mobile phones. Adjusts based on screen size. -->
+      <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <!-- Product cards will be dynamically added here by JavaScript -->
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="bg-black text-gray-400 py-6">
+    <div class="container mx-auto px-4 text-center">
+      <p>&copy; 2025 DL pvt.ltd. - By Ankit Sharma .All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Owner Details Modal -->
+  <div id="owner-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-md w-full relative modal-content">
+      <h3 class="text-2xl font-bold text-gray-900 mb-4">About Ankit Sharma</h3>
+      <p class="text-gray-700 leading-relaxed">
+        Ankit has over 3 years of experience in the tech industry, specializing in hardware diagnostics and repair. Driven by a passion for reducing e-waste, Ankit founded this market to give high-quality devices a second life. He personally oversees the refurbishment process for every phone, ensuring each one meets the highest standards.
+      </p>
+      <button id="close-owner-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div id="cart-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-lg w-full relative modal-content">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6">Your Cart</h3>
+      <div id="cart-items-container" class="space-y-4 max-h-80 overflow-y-auto">
+        <!-- Cart items will be dynamically added here -->
+      </div>
+      <div id="empty-cart-message" class="text-center text-gray-500 hidden py-8">Your cart is empty.</div>
+      <div class="mt-6 pt-4 border-t border-gray-200">
+        <div class="flex justify-between items-center text-xl font-bold text-gray-900 mb-4">
+          <span>Total:</span>
+          <span id="cart-total-price">₹0.00</span>
+        </div>
+        <div class="flex flex-col sm:flex-row justify-between gap-4">
+          <button id="empty-cart-btn" class="w-full sm:w-1/2 bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
+            Empty Cart
+          </button>
+          <button id="checkout-btn" class="w-full sm:w-1/2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
+            Checkout
+          </button>
+        </div>
+      </div>
+      <button id="close-cart-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Contact Owner Modal -->
+  <div id="contact-owner-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-lg w-full relative modal-content">
+      <h3 class="text-2xl font-bold text-gray-900 mb-4">Contact Ankit Sharma</h3>
+      <p class="text-gray-700 mb-6">
+        Fill out the form below to send a message via WhatsApp, or call for immediate assistance.
+      </p>
+      <form id="contact-owner-form">
+        <div class="mb-4">
+          <label for="contact-name" class="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+          <input type="text" id="contact-name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="e.g., Ankit" required>
+        </div>
+        <div class="mb-4">
+          <label for="contact-email" class="block text-sm font-medium text-gray-700 mb-2">Your Email</label>
+          <input type="email" id="contact-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="e.g., ankit@email.com" required>
+        </div>
+        <div class="mb-4">
+          <label for="contact-phone" class="block text-sm font-medium text-gray-700 mb-2">Your Phone Number</label>
+          <input type="tel" id="contact-phone" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="e.g., +91 9876543210" required>
+        </div>
+        <div class="mb-4">
+          <label for="contact-textarea" class="block text-sm font-medium text-gray-700 mb-2">Your Message</label>
+          <textarea id="contact-textarea" class="w-full h-40 p-4 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="Enter your message here..." required></textarea>
+        </div>
+        <a id="send-whatsapp-btn" class="w-full block text-center bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors duration-300 animate-glow" target="_blank" href="#">
+          Send via WhatsApp
+        </a>
+      </form>
+      <div class="mt-4">
+        <a href="tel:+918053671703" class="w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors duration-300 block">
+          Call Ankit (+91 8053671703)
+        </a>
+      </div>
+      <button id="close-contact-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Image Viewer Modal -->
+  <div id="image-viewer-modal" class="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none z-50">
+    <div class="relative w-full h-full flex items-center justify-center">
+      <img id="image-viewer-img" src="" alt="Full-size product image" class="max-w-full max-h-full object-contain rounded-xl shadow-2xl">
+      <button id="close-image-viewer-modal" class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="login-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-md w-full relative modal-content">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Login to Your Account</h3>
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label for="login-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <input type="email" id="login-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="e.g., ankit@email.com" required>
+        </div>
+        <div>
+          <label for="login-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+          <input type="password" id="login-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="••••••••" required>
+        </div>
+        <div id="login-message" class="text-center text-sm font-medium hidden"></div>
+        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors duration-300 animate-glow">
+          Login
+        </button>
+      </form>
+      <div class="mt-6 text-center text-sm text-gray-600">
+        Don't have an account? <button id="switch-to-signup" class="text-orange-500 hover:underline font-semibold">Sign Up</button>
+      </div>
+      <button id="close-login-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Signup Modal -->
+  <div id="signup-modal" class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none">
+    <div class="bg-white rounded-xl shadow-xl p-8 max-w-md w-full relative modal-content">
+      <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Create an Account</h3>
+      <form id="signup-form" class="space-y-4">
+        <div>
+          <label for="signup-name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+          <input type="text" id="signup-name" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="e.g., Ankit Sharma" required>
+        </div>
+        <div>
+          <label for="signup-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <input type="email" id="signup-email" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="e.g., ankit@email.com" required>
+        </div>
+        <div>
+          <label for="signup-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+          <input type="password" id="signup-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="••••••••" required>
+        </div>
+        <div>
+          <label for="signup-confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+          <input type="password" id="signup-confirm-password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-orange-500 focus:border-orange-500 transition-colors" placeholder="••••••••" required>
+        </div>
+        <div id="signup-message" class="text-center text-sm font-medium hidden"></div>
+        <button type="submit" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors duration-300 animate-glow">
+          Sign Up
+        </button>
+      </form>
+      <div class="mt-6 text-center text-sm text-gray-600">
+        Already have an account? <button id="switch-to-login" class="text-orange-500 hover:underline font-semibold">Log In</button>
+      </div>
+      <button id="close-signup-modal" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- JavaScript for dynamic content and interactivity -->
+  <script>
+    window.onload = function() {
+      // Define the data for the refurbished iPhones
+      const refurbishedMobiles = [
+        { id: 'iphone-15-pro-max', name: 'iPhone 15 Pro Max', condition: 'Excellent', price: 90000, imageUrl: 'https://placehold.co/400x300/1C1C1C/FFFFFF?text=iPhone+15+Pro+Max' },
+        { id: 'iphone-15-pro', name: 'iPhone 15 Pro', condition: 'Excellent', price: 70000, imageUrl: 'https://placehold.co/400x300/2C2C2C/FFFFFF?text=iPhone+15+Pro' },
+        { id: 'iphone-15', name: 'iPhone 15', condition: 'Very Good', price: 53000, imageUrl: 'https://placehold.co/400x300/3C3C3C/FFFFFF?text=iPhone+15' },
+        { id: 'iphone-14-pro-max', name: 'iPhone 14 Pro Max', condition: 'Excellent', price: 62000, imageUrl: 'https://placehold.co/400x300/4C4C4C/FFFFFF?text=iPhone+14+Pro+Max' },
+        { id: 'iphone-14-pro', name: 'iPhone 14 Pro', condition: 'Excellent', price: 55000, imageUrl: 'https://placehold.co/400x300/5C5C5C/FFFFFF?text=iPhone+14+Pro' },
+        { id: 'iphone-14', name: 'iPhone 14', condition: 'Very Good', price: 37000, imageUrl: 'https://placehold.co/400x300/6C6C6C/FFFFFF?text=iPhone+14' },
+        { id: 'iphone-13-pro-max', name: 'iPhone 13 Pro Max', condition: 'Excellent', price: 52000, imageUrl: 'https://placehold.co/400x300/7C7C7C/FFFFFF?text=iPhone+13+Pro+Max' },
+        { id: 'iphone-13-pro', name: 'iPhone 13 Pro', condition: 'Very Good', price: 48000, imageUrl: 'https://placehold.co/400x300/8C8C8C/FFFFFF?text=iPhone+13+Pro' },
+        { id: 'iphone-13', name: 'iPhone 13', condition: 'Very Good', price: 29000, imageUrl: 'https://placehold.co/400x300/9C9C9C/FFFFFF?text=iPhone+13' },
+        { id: 'iphone-13-mini', name: 'iPhone 13 mini', condition: 'Very Good', price: 27000, imageUrl: 'https://placehold.co/400x300/9C9C9C/FFFFFF?text=iPhone+13+mini' },
+        { id: 'iphone-12-pro-max', name: 'iPhone 12 Pro Max', condition: 'Good', price: 42000, imageUrl: 'https://placehold.co/400x300/ACACAC/FFFFFF?text=iPhone+12+Pro+Max' },
+        { id: 'iphone-12', name: 'iPhone 12', condition: 'Good', price: 21000, imageUrl: 'https://placehold.co/400x300/BCBCBC/FFFFFF?text=iPhone+12' },
+        { id: 'iphone-12-mini', name: 'iPhone 12 mini', condition: 'Good', price: 19000, imageUrl: 'https://placehold.co/400x300/BCBCBC/FFFFFF?text=iPhone+12+mini' },
+        { id: 'iphone-11-pro-max', name: 'iPhone 11 Pro Max', condition: 'Good', price: 25000, imageUrl: 'https://placehold.co/400x300/DCDCFC/FFFFFF?text=iPhone+11+Pro+Max' },
+        { id: 'iphone-11', name: 'iPhone 11', condition: 'Good', price: 16500, imageUrl: 'https://placehold.co/400x300/EFEFEF/6B7280?text=iPhone+11' },
+        { id: 'iphone-xs', name: 'iPhone XS', condition: 'Fair', price: 14000, imageUrl: 'https://placehold.co/400x300/F5F5F5/6B7280?text=iPhone+XS' },
+        { id: 'iphone-x', name: 'iPhone X', condition: 'Fair', price: 12000, imageUrl: 'https://placehold.co/400x300/F9F9F9/6B7280?text=iPhone+X' },
+        { id: 'iphone-8-plus', name: 'iPhone 8 Plus', condition: 'Good', price: 9000, imageUrl: 'https://placehold.co/400x300/F0F0F0/6B7280?text=iPhone+8+Plus' },
+        { id: 'iphone-8', name: 'iPhone 8', condition: 'Good', price: 7000, imageUrl: 'https://placehold.co/400x300/EAEAEA/6B7280?text=iPhone+8' },
+        { id: 'iphone-7', name: 'iPhone 7', condition: 'Fair', price: 4500, imageUrl: 'https://placehold.co/400x300/E1E1E1/6B7280?text=iPhone+7' },
+        { id: 'iphone-6s-plus', name: 'iPhone 6S Plus', condition: 'Fair', price: 5000, imageUrl: 'https://placehold.co/400x300/D9D9D9/6B7280?text=iPhone+6S+Plus' },
+        { id: 'iphone-6s', name: 'iPhone 6S', condition: 'Fair', price: 4000, imageUrl: 'https://placehold.co/400x300/D2D2D2/6B7280?text=iPhone+6S' },
+        { id: 'iphone-6', name: 'iPhone 6', condition: 'Fair', price: 3500, imageUrl: 'https://placehold.co/400x300/CFCFCF/6B7280?text=iPhone+6' },
+        { id: 'iphone-se-2022', name: 'iPhone SE (2022)', condition: 'Excellent', price: 28000, imageUrl: 'https://placehold.co/400x300/4C4C4C/FFFFFF?text=iPhone+SE' },
+      ];
+
+      // Get DOM elements
+      const productGrid = document.getElementById('product-grid');
+      const ownerModal = document.getElementById('owner-modal');
+      const ownerDetailsBtn = document.getElementById('owner-details-btn');
+      const closeOwnerModalBtn = document.getElementById('close-owner-modal');
+      const cartButton = document.getElementById('cart-button');
+      const cartCountSpan = document.getElementById('cart-count');
+      const cartModal = document.getElementById('cart-modal');
+      const closeCartModalBtn = document.getElementById('close-cart-modal');
+      const cartItemsContainer = document.getElementById('cart-items-container');
+      const cartTotalPrice = document.getElementById('cart-total-price');
+      const emptyCartBtn = document.getElementById('empty-cart-btn');
+      const checkoutBtn = document.getElementById('checkout-btn');
+      const emptyCartMessage = document.getElementById('empty-cart-message');
+      const contactButton = document.getElementById('contact-button');
+      const contactOwnerModal = document.getElementById('contact-owner-modal');
+      const closeContactModalBtn = document.getElementById('close-contact-modal');
+      const contactNameInput = document.getElementById('contact-name');
+      const contactEmailInput = document.getElementById('contact-email');
+      const contactPhoneInput = document.getElementById('contact-phone');
+      const contactTextarea = document.getElementById('contact-textarea');
+      const sendWhatsappBtn = document.getElementById('send-whatsapp-btn');
+      const searchInput = document.getElementById('search-input');
+      const sortByPrice = document.getElementById('sort-by-price');
+      const imageViewerModal = document.getElementById('image-viewer-modal');
+      const closeImageViewerModalBtn = document.getElementById('close-image-viewer-modal');
+      const imageViewerImg = document.getElementById('image-viewer-img');
+      const loginButton = document.getElementById('login-button');
+      const loginModal = document.getElementById('login-modal');
+      const closeLoginModalBtn = document.getElementById('close-login-modal');
+      const loginForm = document.getElementById('login-form');
+      const loginMessage = document.getElementById('login-message');
+      const signupModal = document.getElementById('signup-modal');
+      const closeSignupModalBtn = document.getElementById('close-signup-modal');
+      const signupForm = document.getElementById('signup-form');
+      const signupMessage = document.getElementById('signup-message');
+      const switchToSignupBtn = document.getElementById('switch-to-signup');
+      const switchToLoginBtn = document.getElementById('switch-to-login');
+
+      // Price Range Slider DOM elements
+      const sliderTrack = document.getElementById('slider-track');
+      const filledTrack = document.getElementById('slider-filled-track');
+      const minThumb = document.getElementById('min-thumb');
+      const maxThumb = document.getElementById('max-thumb');
+      const minPriceInput = document.getElementById('min-price-input');
+      const maxPriceInput = document.getElementById('max-price-input');
+
+      // State for the cart and a simple in-memory "database" for users
+      let cart = [];
+      const users = {}; // A simple object to store users: {email: {name, password}}
+
+      // Price range slider variables
+      const minPossiblePrice = 3000; // Based on the cheapest phone
+      const maxPossiblePrice = 110000; // Based on the most expensive phone
+      let minCurrentPrice = minPossiblePrice;
+      let maxCurrentPrice = maxPossiblePrice;
+
+      // Function to show a modal
+      function showModal(modalElement) {
+        modalElement.classList.remove('opacity-0', 'pointer-events-none');
+        modalElement.classList.add('modal-enter-active');
+      }
+
+      // Function to hide a modal
+      function hideModal(modalElement) {
+        modalElement.classList.remove('modal-enter-active');
+        modalElement.classList.add('modal-exit-active');
+        setTimeout(() => {
+          modalElement.classList.add('opacity-0', 'pointer-events-none');
+          modalElement.classList.remove('modal-exit-active');
+        }, 200);
+      }
+
+      // Function to show the image viewer modal
+      function showImageViewer(imageUrl) {
+          imageViewerImg.src = imageUrl;
+          showModal(imageViewerModal);
+      }
+
+      // Function to hide the image viewer modal
+      function hideImageViewer() {
+          hideModal(imageViewerModal);
+      }
+
+      // Function to update the price slider's visual state
+      function updateSlider() {
+        const sliderWidth = sliderTrack.offsetWidth;
+        const minPos = ((minCurrentPrice - minPossiblePrice) / (maxPossiblePrice - minPossiblePrice)) * sliderWidth;
+        const maxPos = ((maxCurrentPrice - minPossiblePrice) / (maxPossiblePrice - minPossiblePrice)) * sliderWidth;
+
+        minThumb.style.left = `${minPos}px`;
+        maxThumb.style.left = `${maxPos}px`;
+        filledTrack.style.left = `${minPos}px`;
+        filledTrack.style.width = `${maxPos - minPos}px`;
+
+        minPriceInput.value = minCurrentPrice;
+        maxPriceInput.value = maxCurrentPrice;
+      }
+
+      // Function to render the product cards based on a provided array of products
+      function renderProducts(productsToDisplay) {
+        productGrid.innerHTML = ''; // Clear the grid first
+
+        if (productsToDisplay.length === 0) {
+          productGrid.innerHTML = '<div class="col-span-full text-center text-gray-500 text-xl py-12">No products match your criteria.</div>';
+          return;
+        }
+
+        productsToDisplay.forEach(mobile => {
+          const cardHtml = `
+            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group">
+              <img
+                src="${mobile.imageUrl}"
+                alt="${mobile.name}"
+                class="w-full h-48 object-cover cursor-pointer product-image transition-transform duration-300 group-hover:scale-105"
+                onerror="this.onerror=null;this.src='https://placehold.co/400x300/E5E7EB/6B7280?text=Image+Not+Found';"
+              />
+              <div class="p-6">
+                <h3 class="text-2xl font-bold text-gray-900 mb-2">${mobile.name}</h3>
+                <p class="text-lg font-semibold text-orange-500 mb-4">₹${mobile.price}</p>
+                <div class="text-sm text-gray-600 space-y-1">
+                  <div class="flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>Owned by Ankit Sharma</span>
+                  </div>
+                </div>
+                <button data-id="${mobile.id}" class="add-to-cart-btn mt-6 w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg shadow-md transition-colors duration-300">
+                  Add to Cart
+                </button>
+              </div>
+            </div>
+          `;
+          productGrid.insertAdjacentHTML('beforeend', cardHtml);
+        });
+      }
+
+      // Function to handle filtering and sorting of products
+      function renderFilteredProducts() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const sortOrder = sortByPrice.value;
+
+        // Filter products based on search term and price range
+        let filteredProducts = refurbishedMobiles.filter(mobile => {
+          const matchesSearch = mobile.name.toLowerCase().includes(searchTerm);
+          const inPriceRange = mobile.price >= minCurrentPrice && mobile.price <= maxCurrentPrice;
+          return matchesSearch && inPriceRange;
+        });
+
+        // Sort products based on the selected sort order
+        if (sortOrder === 'low-to-high') {
+          filteredProducts.sort((a, b) => a.price - b.price);
+        } else if (sortOrder === 'high-to-low') {
+          filteredProducts.sort((a, b) => b.price - a.price);
+        }
+
+        renderProducts(filteredProducts);
+      }
+
+      // Function to render the cart modal content
+      function renderCartModal() {
+        cartItemsContainer.innerHTML = ''; // Clear existing items
+        let total = 0;
+
+        if (cart.length === 0) {
+          emptyCartMessage.classList.remove('hidden');
+          cartTotalPrice.textContent = '₹0.00';
+          checkoutBtn.disabled = true;
+          checkoutBtn.classList.add('bg-gray-400', 'hover:bg-gray-400', 'cursor-not-allowed');
+          checkoutBtn.classList.remove('bg-orange-500', 'hover:bg-orange-600');
+        } else {
+          emptyCartMessage.classList.add('hidden');
+          checkoutBtn.disabled = false;
+          checkoutBtn.classList.remove('bg-gray-400', 'hover:bg-gray-400', 'cursor-not-allowed');
+          checkoutBtn.classList.add('bg-orange-500', 'hover:bg-orange-600');
+          cart.forEach(item => {
+            total += item.price;
+            const cartItemHtml = `
+              <div class="flex items-center justify-between p-4 bg-gray-100 rounded-lg">
+                <div class="flex-grow">
+                  <h4 class="text-lg font-semibold text-gray-900">${item.name}</h4>
+                  <p class="text-gray-600">₹${item.price}</p>
+                </div>
+                <button data-id="${item.id}" class="remove-from-cart-btn text-gray-400 hover:text-red-500 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+                </button>
+              </div>
+            `;
+            cartItemsContainer.insertAdjacentHTML('beforeend', cartItemHtml);
+          });
+          cartTotalPrice.textContent = `₹${total.toFixed(2)}`;
+        }
+      }
+
+      // Function to update the message textarea and WhatsApp link in the contact modal
+      function updateWhatsappMessage() {
+        const ownerNumber = '918053671703';
+        const name = contactNameInput.value || 'Customer';
+        const email = contactEmailInput.value || 'N/A';
+        const phone = contactPhoneInput.value || 'N/A';
+        const message = contactTextarea.value || 'I am interested in your refurbished iPhones.';
+
+        let messageContent = `Hello Ankit,\n\nI am ${name}. I am writing to you from your website.\n\nMy details are:\nEmail: ${email}\nPhone: ${phone}\n\nMy message is:\n${message}`;
+
+        if (cart.length > 0) {
+          let cartItemsMessage = "\n\nI have the following items in my cart:\n";
+          let total = 0;
+          cart.forEach(item => {
+            cartItemsMessage += `- ${item.name} (₹${item.price.toFixed(2)})\n`;
+            total += item.price;
+          });
+          cartItemsMessage += `\nTotal: ₹${total.toFixed(2)}\n\nPlease let me know how to proceed with the payment.`;
+          messageContent += cartItemsMessage;
+        }
+
+        const encodedMessage = encodeURIComponent(messageContent);
+        sendWhatsappBtn.href = `https://wa.me/${ownerNumber}?text=${encodedMessage}`;
+      }
+
+      // Function to display a message box
+      function showMessageBox(message, type = 'success') {
+          const messageBox = document.createElement('div');
+          let bgColor = type === 'success' ? 'bg-orange-500' : 'bg-red-500';
+          messageBox.className = `fixed top-4 right-4 ${bgColor} text-white px-6 py-3 rounded-lg shadow-xl text-lg font-semibold transition-transform duration-300 transform translate-x-full`;
+          messageBox.textContent = message;
+          document.body.appendChild(messageBox);
+
+          setTimeout(() => {
+              messageBox.classList.remove('translate-x-full');
+          }, 10);
+
+          setTimeout(() => {
+              messageBox.classList.add('translate-x-full');
+              setTimeout(() => {
+                  messageBox.remove();
+              }, 300);
+          }, 2000);
+      }
+
+      // Event listener for the owner details button
+      ownerDetailsBtn.addEventListener('click', () => {
+        showModal(ownerModal);
+      });
+
+      // Event listener for the close owner modal button
+      closeOwnerModalBtn.addEventListener('click', () => {
+        hideModal(ownerModal);
+      });
+
+      // Event listener for clicking outside the owner modal to close it
+      ownerModal.addEventListener('click', (e) => {
+        if (e.target === ownerModal) {
+          hideModal(ownerModal);
+        }
+      });
+
+      // Event listener for the cart button to open the cart modal
+      cartButton.addEventListener('click', () => {
+        renderCartModal();
+        showModal(cartModal);
+      });
+
+      // Event listener for the close cart modal button
+      closeCartModalBtn.addEventListener('click', () => {
+        hideModal(cartModal);
+      });
+
+      // Event listener for clicking outside the cart modal to close it
+      cartModal.addEventListener('click', (e) => {
+        if (e.target === cartModal) {
+          hideModal(cartModal);
+        }
+      });
+
+      // Event listener for "Empty Cart" button
+      emptyCartBtn.addEventListener('click', () => {
+        cart = [];
+        cartCountSpan.textContent = '0';
+        cartCountSpan.classList.remove('scale-100');
+        renderCartModal();
+      });
+
+      // Event listener for the checkout button
+      checkoutBtn.addEventListener('click', () => {
+        hideModal(cartModal);
+        contactTextarea.value = ''; // Clear text area for new message
+        updateWhatsappMessage();
+        showModal(contactOwnerModal);
+      });
+
+      // Event listener for the new contact button in the header
+      contactButton.addEventListener('click', () => {
+        contactNameInput.value = '';
+        contactEmailInput.value = '';
+        contactPhoneInput.value = '';
+        contactTextarea.value = '';
+        updateWhatsappMessage();
+        showModal(contactOwnerModal);
+      });
+
+      // Event listener for the close "contact owner" modal button
+      closeContactModalBtn.addEventListener('click', () => {
+        hideModal(contactOwnerModal);
+      });
+
+      // Event listener for clicking outside the "contact owner" modal to close it
+      contactOwnerModal.addEventListener('click', (e) => {
+        if (e.target === contactOwnerModal) {
+          hideModal(contactOwnerModal);
+        }
+      });
+
+      // Event listener for form input changes to update the WhatsApp message link
+      contactOwnerModal.addEventListener('input', updateWhatsappMessage);
+
+      // Event listener for the image viewer close button
+      closeImageViewerModalBtn.addEventListener('click', () => {
+          hideImageViewer();
+      });
+
+      // Event listener for clicking outside the image viewer modal
+      imageViewerModal.addEventListener('click', (e) => {
+          if (e.target === imageViewerModal) {
+              hideImageViewer();
+          }
+      });
+
+      // Event delegation for the "Add to Cart" and image click buttons
+      productGrid.addEventListener('click', (e) => {
+        if (e.target.classList.contains('add-to-cart-btn')) {
+          const productId = e.target.dataset.id;
+          const mobileToAdd = refurbishedMobiles.find(m => m.id === productId);
+
+          if (mobileToAdd) {
+            cart.push(mobileToAdd);
+            cartCountSpan.textContent = cart.length;
+            cartCountSpan.classList.add('scale-100'); // Animate the cart count
+            showMessageBox(`${mobileToAdd.name} added to cart!`);
+          }
+        } else if (e.target.classList.contains('product-image')) {
+            showImageViewer(e.target.src);
+        }
+      });
+
+      // Event delegation for the "Remove" buttons inside the cart modal
+      cartItemsContainer.addEventListener('click', (e) => {
+        if (e.target.closest('.remove-from-cart-btn')) {
+          const productIdToRemove = e.target.closest('.remove-from-cart-btn').dataset.id;
+          const indexToRemove = cart.findIndex(item => item.id === productIdToRemove);
+
+          if (indexToRemove > -1) {
+            cart.splice(indexToRemove, 1);
+            cartCountSpan.textContent = cart.length;
+            if (cart.length === 0) {
+              cartCountSpan.classList.remove('scale-100');
+            }
+            renderCartModal(); // Re-render the cart modal
+          }
+        }
+      });
+
+      // Add event listeners for the new controls to trigger filtering and sorting
+      searchInput.addEventListener('input', renderFilteredProducts);
+      sortByPrice.addEventListener('change', renderFilteredProducts);
+
+      // === PRICE RANGE SLIDER FUNCTIONALITY ===
+      let isMinDragging = false;
+      let isMaxDragging = false;
+
+      // Handle mouse down on min thumb
+      minThumb.addEventListener('mousedown', (e) => {
+        isMinDragging = true;
+      });
+
+      // Handle mouse down on max thumb
+      maxThumb.addEventListener('mousedown', (e) => {
+        isMaxDragging = true;
+      });
+
+      // Handle mouse move to drag the thumbs
+      document.addEventListener('mousemove', (e) => {
+        if (isMinDragging || isMaxDragging) {
+          // Get the slider's bounding rectangle to calculate relative position
+          const sliderRect = sliderTrack.getBoundingClientRect();
+          const newX = e.clientX - sliderRect.left;
+          const newPos = Math.max(0, Math.min(newX, sliderRect.width));
+          
+          const newPrice = Math.round((newPos / sliderRect.width) * (maxPossiblePrice - minPossiblePrice)) + minPossiblePrice;
+          const snapValue = 1000; // Snap to the nearest 1000 for smoother interaction
+          const snappedPrice = Math.round(newPrice / snapValue) * snapValue;
+
+          if (isMinDragging) {
+            if (snappedPrice < maxCurrentPrice) {
+              minCurrentPrice = snappedPrice;
+            }
+          }
+          if (isMaxDragging) {
+            if (snappedPrice > minCurrentPrice) {
+              maxCurrentPrice = snappedPrice;
+            }
+          }
+          updateSlider();
+          renderFilteredProducts();
+        }
+      });
+
+      // Handle mouse up to stop dragging
+      document.addEventListener('mouseup', () => {
+        isMinDragging = false;
+        isMaxDragging = false;
+      });
+
+      // Handle direct input to the price fields
+      minPriceInput.addEventListener('change', (e) => {
+        let newMin = parseInt(e.target.value, 10) || minPossiblePrice;
+        newMin = Math.max(minPossiblePrice, Math.min(newMin, maxCurrentPrice));
+        minCurrentPrice = newMin;
+        updateSlider();
+        renderFilteredProducts();
+      });
+
+      maxPriceInput.addEventListener('change', (e) => {
+        let newMax = parseInt(e.target.value, 10) || maxPossiblePrice;
+        newMax = Math.min(maxPossiblePrice, Math.max(newMax, minCurrentPrice));
+        maxCurrentPrice = newMax;
+        updateSlider();
+        renderFilteredProducts();
+      });
+
+      // === LOGIN/SIGNUP FUNCTIONALITY ===
+      loginButton.addEventListener('click', () => {
+          showModal(loginModal);
+      });
+      closeLoginModalBtn.addEventListener('click', () => {
+          hideModal(loginModal);
+          loginMessage.textContent = '';
+          loginMessage.classList.add('hidden');
+          loginForm.reset();
+      });
+      closeSignupModalBtn.addEventListener('click', () => {
+          hideModal(signupModal);
+          signupMessage.textContent = '';
+          signupMessage.classList.add('hidden');
+          signupForm.reset();
+      });
+      loginModal.addEventListener('click', (e) => {
+          if (e.target === loginModal) {
+              hideModal(loginModal);
+              loginMessage.textContent = '';
+              loginMessage.classList.add('hidden');
+              loginForm.reset();
+          }
+      });
+      signupModal.addEventListener('click', (e) => {
+          if (e.target === signupModal) {
+              hideModal(signupModal);
+              signupMessage.textContent = '';
+              signupMessage.classList.add('hidden');
+              signupForm.reset();
+          }
+      });
+      switchToSignupBtn.addEventListener('click', () => {
+          hideModal(loginModal);
+          showModal(signupModal);
+      });
+      switchToLoginBtn.addEventListener('click', () => {
+          hideModal(signupModal);
+          showModal(loginModal);
+      });
+      signupForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const name = document.getElementById('signup-name').value;
+          const email = document.getElementById('signup-email').value;
+          const password = document.getElementById('signup-password').value;
+          const confirmPassword = document.getElementById('signup-confirm-password').value;
+          signupMessage.classList.remove('hidden');
+          if (password !== confirmPassword) {
+              signupMessage.textContent = 'Passwords do not match!';
+              signupMessage.classList.add('text-red-500');
+              signupMessage.classList.remove('text-green-500');
+              return;
+          }
+          if (users[email]) {
+              signupMessage.textContent = 'An account with this email already exists.';
+              signupMessage.classList.add('text-red-500');
+              signupMessage.classList.remove('text-green-500');
+              return;
+          }
+          users[email] = { name, password };
+          signupMessage.textContent = 'Account created successfully!';
+          signupMessage.classList.add('text-green-500');
+          signupMessage.classList.remove('text-red-500');
+          signupForm.reset();
+          setTimeout(() => {
+              hideModal(signupModal);
+              showMessageBox('Signup successful! Please log in.');
+          }, 1000);
+      });
+      loginForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const email = document.getElementById('login-email').value;
+          const password = document.getElementById('login-password').value;
+          loginMessage.classList.remove('hidden');
+          if (!users[email] || users[email].password !== password) {
+              loginMessage.textContent = 'Invalid email or password.';
+              loginMessage.classList.add('text-red-500');
+              loginMessage.classList.remove('text-green-500');
+              return;
+          }
+          loginMessage.textContent = `Login successful! Welcome back, ${users[email].name}!`;
+          loginMessage.classList.add('text-green-500');
+          loginMessage.classList.remove('text-red-500');
+          loginForm.reset();
+          setTimeout(() => {
+              hideModal(loginModal);
+              showMessageBox('Login successful!');
+          }, 1000);
+      });
+
+      // Initial render of the products and slider
+      updateSlider();
+      renderFilteredProducts();
+    };
+  </script>
+</body>
+</html>
